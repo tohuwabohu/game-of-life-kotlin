@@ -8,8 +8,8 @@ import java.util.concurrent.atomic.AtomicReference
 class Grid(
         private val dimension: Dimension
 ) {
-    private val current: AtomicReference<Array<CellState>> = AtomicReference(Array(dimension.siz()) { CellState.Dead })
-    private val next: AtomicReference<Array<CellState>> = AtomicReference(Array(dimension.siz()) { CellState.Dead })
+    private val current: AtomicReference<Array<CellState>> = AtomicReference(Array(dimension.size()) { CellState.Dead })
+    private val next: AtomicReference<Array<CellState>> = AtomicReference(Array(dimension.size()) { CellState.Dead })
 
     companion object {
         val log: Logger = LoggerFactory.getLogger(Grid::class.java)
@@ -33,9 +33,8 @@ class Grid(
                 index + dimension.value,        // bottom
                 index + dimension.value + 1     // bottom right
         ).count {
-            // TODO: handle out of bounds
             // TODO: handle wrap around
-            current.get()[it] == CellState.Alive
+            dimension.inRange(it) && current.get()[it] == CellState.Alive
         }
     }
 
@@ -49,11 +48,11 @@ class Grid(
 
     fun update(cell: Cell, state: CellState) {
         log.debug("Updating status for cell $cell to $state")
-        val index = dimension.indexFromCell(cell)
-        if (next.get().size <= index) {
-            throw IllegalArgumentException("Cell $cell is out of range for this grid with length ${current.get().size} and dimension ${dimension.value}")
-        }
-        next.get()[index] = state
+        next.get()[dimension.indexFromCell(cell)] = state
         log.info("Updated status for cell $cell to $state")
+    }
+
+    fun externalize(): Array<CellState> {
+        return current.get().clone()
     }
 }

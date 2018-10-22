@@ -9,10 +9,18 @@ data class Dimension(val value: Int) {
     }
 
     fun indexFromCell(cell: Cell): Int {
-        return cell.x * value + cell.y
+        val index = cell.x * value + cell.y
+        if (!inRange(index)) {
+            throw IllegalArgumentException("Cell $cell is out of range for this dimension ${size()}")
+        }
+        return index
     }
 
-    fun siz(): Int {
+    fun inRange(index: Int): Boolean {
+        return index >= 0 && index < size()
+    }
+
+    fun size(): Int {
         return value * value
     }
 }
