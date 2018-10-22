@@ -7,12 +7,13 @@ class WorldTest {
 
     @Test
     fun block() {
-        val grid = Grid(Dimension(4))
-        grid.update(Cell(1,1), CellState.Alive)
-        grid.update(Cell(1,2), CellState.Alive)
-        grid.update(Cell(2,1), CellState.Alive)
-        grid.update(Cell(2,2), CellState.Alive)
-        grid.swap()
+        val grid = Grid(Dimension(4)).initialize(
+                Cell(1,1),
+                Cell(1,2),
+                Cell(2,1),
+                Cell(2,2)
+        )
+
         val stateBefore = grid.externalize()
 
         World(grid).tick()
@@ -22,11 +23,11 @@ class WorldTest {
 
     @Test
     fun blinker() {
-        val grid = Grid(Dimension(5))
-        grid.update(Cell(2,1), CellState.Alive)
-        grid.update(Cell(2,2), CellState.Alive)
-        grid.update(Cell(2,3), CellState.Alive)
-        grid.swap()
+        val grid = Grid(Dimension(5)).initialize(
+                Cell(2,1),
+                Cell(2,2),
+                Cell(2,3)
+        )
 
         val world = World(grid)
 

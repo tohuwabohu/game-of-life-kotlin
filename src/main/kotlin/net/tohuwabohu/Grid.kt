@@ -52,6 +52,12 @@ class Grid(
         log.info("Updated status for cell $cell to $state")
     }
 
+    fun initialize(vararg cells: Cell): Grid {
+        cells.forEach { update(it, CellState.Alive) }
+        swap()
+        return this
+    }
+
     fun externalize(): Array<CellState> {
         return current.get().clone()
     }
