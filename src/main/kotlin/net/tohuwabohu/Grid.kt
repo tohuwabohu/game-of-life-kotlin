@@ -1,23 +1,35 @@
 package net.tohuwabohu
 
-import java.util.Arrays
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.util.concurrent.atomic.AtomicReference
 
 
-data class Grid(private val state: Array<Array<CellState>>) {
+class Grid(
+        private val dimension: Int
+) {
+    private val current: AtomicReference<Array<CellState>> = AtomicReference(Array(dimension * dimension) { CellState.Dead })
+    private val next: AtomicReference<Array<CellState>> = AtomicReference(Array(dimension * dimension) { CellState.Dead })
 
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Grid
-
-        if (!Arrays.equals(state, other.state)) return false
-
-        return true
+    companion object {
+        val log: Logger = LoggerFactory.getLogger(Grid::class.java)
     }
 
-    override fun hashCode(): Int {
-        return Arrays.hashCode(state)
+    fun swap() {
+        log.debug("Swapping the grid...")
+        val active = current.get()
+        current.set(next.get())
+        next.set(active)
+        log.info("Swapped the grid; new active is $current, next is $next")
+    }
+
+    fun update(cell: Cell, state: CellState) {
+        log.debug("Updating status for cell $cell to $state")
+        val index = cell.x * dimension + cell.y
+        if (next.get().size <= index) {
+            throw IllegalArgumentException("Cell $cell is out of range for this grid with length ${current.get().size} and dimension $dimension")
+        }
+        next.get()[index] = state
+        log.info("Updated status for cell $cell to $state")
     }
 }
